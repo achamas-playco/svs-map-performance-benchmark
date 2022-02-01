@@ -1,0 +1,159 @@
+:root {
+  --view-size: 80%;
+}
+
+@font-face {
+  font-family: 'Mukta-Regular';
+  src: url('../fonts/Mukta-Regular.ttf') format('truetype');
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #555;
+  font-family: Mukta-Regular, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1em;
+  overflow-x: hidden;
+  position: relative;
+}
+
+#main,
+.fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#app {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+}
+
+#view {
+  opacity: 1;
+  transition: opacity 0.15s ease-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(0deg, #000 0, #505050 100%);
+}
+
+#item-count {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+select {
+  font-size: 3em;
+}
+
+#view-container {
+  width: 100%;
+  height: 100%;
+  outline: 1px solid green;
+  overflow: hidden;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  margin-bottom: 5px;
+  min-height: 1em;
+}
+
+.control .input {
+  text-align: center;
+  width: 70%;
+}
+
+.input.select {
+  color: #fff;
+  background-color: #898989;
+  border: 1px outset #adadad;
+  border-radius: 3px;
+}
+
+.text {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  color: #fff;
+  text-align: center;
+  text-shadow: 1px 1px 5px #000000;
+  user-select: none;
+  pointer-events: none;
+}
+
+#highlight {
+  font-size: 12em;
+}
+
+#size {
+  top: auto;
+  bottom: 1em;
+  right: 1em;
+  text-align: right;
+  font-size: 5em;
+}
+
+#fps {
+  position: absolute;
+  top: 0;
+  right: 0;
+  overflow: hidden;
+  transform: scale(2) translate(-56px, 25px);
+  user-select: none;
+  pointer-events: none;
+}
+
+#fps > div {
+  position: static !important;
+}
+
+#fps > div:first-child > div {
+  background-color: #333;
+}
+
+#fps > div:first-child > div > div {
+  background-color: #50a3e1 !important;
+  background: linear-gradient(0deg, #50a3e1 0, #acffe5 100%) !important;
+}
+
+#group-view {
+  display: none;
+}
+
+#spinner {
+  width: 200px;
+  margin-top: 50%;
+}
+
+@media (min-width: 1000px) {
+  #item-count {
+    font-size: 3em;
+  }
+  .text {
+    font-size: 5em;
+  }
+  #fps {
+    transform: none;
+  }
+}
