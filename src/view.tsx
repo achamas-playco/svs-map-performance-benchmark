@@ -121,6 +121,7 @@ export default function View({ app }: { app?: PIXI.Application }) {
           '500',
           '1000',
           '5000',
+          '7500',
           '10,000',
           '15,000',
           '20,000',
