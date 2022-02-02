@@ -4,28 +4,18 @@ import * as PIXI from 'pixi.js';
 import emitter from './emitter';
 import { FpsView } from 'react-fps';
 import Map from './map';
-
 import Select from './select';
-import state, {
-  defaultItemCount,
-  defaultViewHeight,
-  defaultViewWidth,
-} from './state';
+import state, { defaultItemCount } from './state';
 import { numberWithCommas } from './util';
 
-export default function View() {
+export default function View({ app }: { app?: PIXI.Application }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const { current } = ref;
 
-    if (current) {
-      const app = new PIXI.Application({
-        width: defaultViewWidth,
-        height: defaultViewHeight,
-        resizeTo: current,
-        backgroundColor: 0x110000,
-      });
+    if (current && app) {
+      app.resizeTo = current;
 
       new Map(app);
 
@@ -34,7 +24,7 @@ export default function View() {
       const updateLayout = () => setTimeout(() => emitter.emit('doLayout'), 0);
 
       const update = (propName: string) => (value: number) => {
-        if (ref.current) {
+        if (ref.current && app) {
           ref.current.style[(propName as 'width') || 'height'] = `${value}px`;
           app.resize();
           updateLayout();
@@ -48,7 +38,16 @@ export default function View() {
         .on('margin.horizontal', updateLayout)
         .on('margin.vertical', updateLayout);
     }
-  }, []);
+  }, [app]);
+
+  const onInteractiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    state.item.interactive = e.target.checked;
+    document.getElementById('highlight')!.style.display = state.item.interactive
+      ? 'block'
+      : 'none';
+    emitter.emit('doLayout');
+  };
+
   return (
     <div id="view">
       <div id="view-container" ref={ref}></div>
@@ -66,7 +65,11 @@ export default function View() {
           '1000',
           '5000',
           '10,000',
+          '15,000',
           '20,000',
+          '25,000',
+          '30,000',
+          '35,000',
           '50,000',
           '100,000',
           '1,000,000',
@@ -75,7 +78,19 @@ export default function View() {
           state.item.count = parseInt(value.replace(/,/g, ''));
         }}
       />
-      <span id="highlight" className="text"></span>
+      <label id="interactive">
+        Interactive:{' '}
+        <input
+          type="checkbox"
+          defaultChecked={state.item.interactive}
+          onChange={onInteractiveChange}
+        />
+      </label>
+      <span
+        id="highlight"
+        className="text"
+        style={{ display: state.item.interactive ? 'block' : 'none' }}
+      ></span>
       <span id="size" className="text"></span>
     </div>
   );

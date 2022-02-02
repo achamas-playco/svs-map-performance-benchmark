@@ -9,6 +9,7 @@ interface State {
   };
   item: {
     count: number;
+    interactive: boolean;
   };
 }
 
@@ -19,6 +20,7 @@ const state: State = {
   },
   item: {
     count: defaultItemCount,
+    interactive: true,
   },
 };
 
