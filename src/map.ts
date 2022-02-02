@@ -1,8 +1,7 @@
 import state from './state';
 import { Application, Container, DisplayObject, Sprite } from 'pixi.js';
 import emitter from './emitter';
-import { randomTexture } from './app';
-import Color from 'color';
+import { textures, randomColor } from './app';
 
 const margin = {
   horizontal: 1,
@@ -13,6 +12,7 @@ export default class Map {
   cells: DisplayObject[] = [];
   pfp?: Sprite;
   container: Container = new Container();
+  color: string = randomColor();
 
   constructor(readonly app: Application) {
     emitter.on('*', (eventName) => {
@@ -28,13 +28,17 @@ export default class Map {
       }
     });
 
-    this.init();
+    emitter.on('updateView', () => {
+      this.updateView();
+    });
 
     window.addEventListener('resize', () => {
       state.view.width = app.renderer.view.width;
       state.view.height = app.renderer.view.height;
       emitter.emit('doLayout');
     });
+
+    this.init();
   }
 
   init() {
@@ -74,6 +78,7 @@ export default class Map {
       });
 
       this.doLayout();
+      this.updateView();
     });
   }
 
@@ -99,6 +104,9 @@ export default class Map {
     for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
       x = left;
       for (let columnIndex = 0; columnIndex < columns; columnIndex++) {
+        if (Math.random() < 0.2) {
+          this.color = randomColor();
+        }
         const cell = this.newCell(++id, x, y, cellWidth, cellHeight);
         this.cells.push(cell);
         x += cellWidth + margin.horizontal;
@@ -136,7 +144,7 @@ export default class Map {
   }
 
   newCell(id: number, x: number, y: number, width: number, height: number) {
-    const texture = randomTexture();
+    const texture = textures.get(this.color);
     const sprite = new Sprite(texture);
 
     sprite.interactive = state.item.interactive;
@@ -160,5 +168,25 @@ export default class Map {
     this.container.addChild(sprite);
 
     return sprite;
+  }
+
+  updateView() {
+    const { container } = this;
+
+    const outer = document.getElementById('minimap-outer')!;
+    const inner = document.getElementById('minimap-inner')!;
+    const outerBounds = outer.getBoundingClientRect();
+    const innerBounds = inner.getBoundingClientRect();
+
+    const x =
+      ((innerBounds.left - outerBounds.left) / outerBounds.width) *
+      state.view.width;
+    const y =
+      ((innerBounds.top - outerBounds.top) / outerBounds.height) *
+      state.view.height;
+
+    container.scale.x = this.container.scale.y = state.view.scale;
+    container.x = x;
+    container.y = y;
   }
 }

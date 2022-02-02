@@ -12,6 +12,7 @@
     "test:watch": "jest --maxWorkers=1 --watch"
   },
   "dependencies": {
+    "@use-gesture/react": "^10.2.4",
     "color": "^4.2.0",
     "eventemitter3": "^4.0.7",
     "pixi.js": "^6.1.3",

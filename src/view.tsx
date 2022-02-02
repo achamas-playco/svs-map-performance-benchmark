@@ -3,10 +3,24 @@ import { useEffect, useRef } from 'react';
 import * as PIXI from 'pixi.js';
 import emitter from './emitter';
 import { FpsView } from 'react-fps';
+import { useGesture } from '@use-gesture/react';
 import Map from './map';
 import Select from './select';
 import state, { defaultItemCount } from './state';
 import { numberWithCommas } from './util';
+import MiniMap from './minimap';
+
+document.addEventListener('gesturestart', (e) => e.preventDefault());
+document.addEventListener('gesturechange', (e) => e.preventDefault());
+
+const scaleFactor = 0.1;
+const scaleMin = 0.25;
+const scaleMax = 5;
+
+const setScale = (value: number) => {
+  state.view.scale = Math.max(scaleMin, Math.min(scaleMax, value));
+  emitter.emit('updateView');
+};
 
 export default function View({ app }: { app?: PIXI.Application }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -48,9 +62,52 @@ export default function View({ app }: { app?: PIXI.Application }) {
     emitter.emit('doLayout');
   };
 
+  const bind = useGesture(
+    {
+      onDragStart: (args) => {
+        state.drag.startX = state.view.x;
+        state.drag.startY = state.view.y;
+      },
+      onDrag: (args) => {
+        if (args.pinching) {
+          return;
+        }
+        const deltaX =
+          state.drag.endX === undefined
+            ? args.offset[0]
+            : args.offset[0] - state.drag.endX;
+        const deltaY =
+          state.drag.endY === undefined
+            ? args.offset[1]
+            : args.offset[1] - state.drag.endY;
+        state.view.x = state.drag.startX + deltaX;
+        state.view.y = state.drag.startY + deltaY;
+        emitter.emit('updateView');
+      },
+      onDragEnd: (args) => {
+        state.drag.endX = args.offset[0];
+        state.drag.endY = args.offset[1];
+      },
+      onPinch: (args) => {
+        setScale(args.offset[0]);
+        emitter.emit('updateView');
+      },
+      onWheel: (args) => {
+        const deltaY = args.delta[1];
+        if (deltaY > 0) {
+          setScale(state.view.scale + scaleFactor);
+        } else if (deltaY < 0) {
+          setScale(state.view.scale - scaleFactor);
+        }
+      },
+    },
+    {}
+  );
+
   return (
-    <div id="view">
+    <div id="view" {...bind()}>
       <div id="view-container" ref={ref}></div>
+      <MiniMap />
       <div id="fps">
         <FpsView width={200} height={50} />
       </div>
@@ -92,6 +149,7 @@ export default function View({ app }: { app?: PIXI.Application }) {
         style={{ display: state.item.interactive ? 'block' : 'none' }}
       ></span>
       <span id="size" className="text"></span>
+      <div id="debug" className="text"></div>
     </div>
   );
 }

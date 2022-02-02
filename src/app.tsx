@@ -3,13 +3,30 @@ import View from './view';
 import * as PIXI from 'pixi.js';
 import { defaultViewHeight, defaultViewWidth } from './state';
 
-export const keys = ['red', 'green', 'blue'];
+export const keys = [
+  'red',
+  'green',
+  'blue',
+  'grape',
+  'mocha',
+  'ice',
+  'iron',
+  'strawberry',
+  'banana',
+];
+
 export const textures: Map<string, PIXI.Texture<PIXI.Resource>> = new Map();
+
 export const randomTexture = () => {
-  const index = Math.round(Math.random() * (keys.length - 1));
-  const key = keys[index];
+  const key = randomColor();
   const texture = textures.get(key);
   return texture;
+};
+
+export const randomColor = () => {
+  const index = Math.round(Math.random() * (keys.length - 1));
+  const key = keys[index];
+  return key;
 };
 
 export function App() {
@@ -25,6 +42,7 @@ export function App() {
     keys.forEach((texture) =>
       pixiApp.loader.add(texture, `img/${texture}.png`)
     );
+
     pixiApp.loader.load((_, resources) => {
       keys.forEach((texture) => {
         const tex = resources[texture].texture;
